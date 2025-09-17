@@ -1,0 +1,81 @@
+ body,
+ html {
+     margin: 0;
+     padding: 0;
+     height: 100%;
+     font-family: "Segoe UI", sans-serif;
+ }
+
+ #map {
+     height: 100%;
+     width: 100%;
+ }
+
+ /* Kontrol floating */
+ #controls {
+     position: absolute;
+     top: 10px;
+     left: 50%;
+     transform: translateX(-50%);
+     background: rgba(255, 255, 255, 0.95);
+     padding: 12px 16px;
+     border-radius: 12px;
+     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+     display: flex;
+     flex-wrap: wrap;
+     align-items: center;
+     gap: 8px;
+     z-index: 1000;
+     max-width: 95%;
+     transition: background 0.3s, color 0.3s;
+ }
+
+ #controls.dark {
+     background: rgba(30, 30, 30, 0.95);
+     color: #f5f5f5;
+ }
+
+ #controls input,
+ #controls select {
+     padding: 6px 10px;
+     border: 1px solid #ccc;
+     border-radius: 8px;
+     font-size: 14px;
+     flex: 1;
+     min-width: 70px;
+     background: #fff;
+     color: #000;
+ }
+
+ #controls.dark input,
+ #controls.dark select {
+     background: #222;
+     color: #f5f5f5;
+     border: 1px solid #555;
+ }
+
+ #controls button {
+     padding: 6px 12px;
+     background: #1e88e5;
+     color: white;
+     border: none;
+     border-radius: 8px;
+     cursor: pointer;
+     font-size: 14px;
+     transition: background 0.3s;
+ }
+
+ #controls button:hover {
+     background: #1565c0;
+ }
+
+ @media (max-width: 480px) {
+     #controls {
+         flex-direction: column;
+         align-items: stretch;
+     }
+
+     #controls button {
+         width: 100%;
+     }
+ }
