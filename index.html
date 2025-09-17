@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peta Radius Dinamis - Dark/Light Mode</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+
+        /* Kontrol floating */
+        #controls {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 12px 16px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            z-index: 1000;
+            max-width: 95%;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        #controls.dark {
+            background: rgba(30, 30, 30, 0.95);
+            color: #f5f5f5;
+        }
+
+        #controls input,
+        #controls select {
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+            flex: 1;
+            min-width: 70px;
+            background: #fff;
+            color: #000;
+        }
+
+        #controls.dark input,
+        #controls.dark select {
+            background: #222;
+            color: #f5f5f5;
+            border: 1px solid #555;
+        }
+
+        #controls button {
+            padding: 6px 12px;
+            background: #1e88e5;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        #controls button:hover {
+            background: #1565c0;
+        }
+
+        @media (max-width: 480px) {
+            #controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            #controls button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="controls">
+        <input type="number" id="radiusInput" value="3" step="0.1">
+        <select id="unit">
+            <option value="1000">Kilometer</option>
+            <option value="1">Meter</option>
+        </select>
+        <button onclick="updateRadius()">Update</button>
+        <button onclick="toggleTheme()">🌙/☀️</button>
+    </div>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        let map, circle, lat, lng, currentTheme = "light";
+        let lightTile, darkTile;
+
+        navigator.geolocation.getCurrentPosition(function (position) {
+            lat = position.coords.latitude;
+            lng = position.coords.longitude;
+
+            map = L.map('map').setView([lat, lng], 14);
+
+            // Light mode tile
+            lightTile = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            });
+
+            // Dark mode tile
+            darkTile = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
+                subdomains: 'abcd',
+                maxZoom: 20
+            });
+
+            // default pakai light
+            lightTile.addTo(map);
+
+            L.marker([lat, lng]).addTo(map).bindPopup("📍 Posisi Anda").openPopup();
+
+            // default radius 3 km
+            circle = L.circle([lat, lng], { radius: 3000, color: 'red', fillOpacity: 0.2 }).addTo(map);
+        });
+
+        function updateRadius() {
+            let value = document.getElementById("radiusInput").value;
+            let unit = document.getElementById("unit").value;
+
+            let radius = value * unit;
+
+            if (circle) {
+                map.removeLayer(circle);
+            }
+
+            let color = currentTheme === "dark" ? "lime" : "blue";
+            circle = L.circle([lat, lng], { radius: radius, color: color, fillOpacity: 0.25 }).addTo(map);
+            map.fitBounds(circle.getBounds());
+        }
+
+        function toggleTheme() {
+            const controls = document.getElementById("controls");
+
+            if (currentTheme === "light") {
+                map.removeLayer(lightTile);
+                darkTile.addTo(map);
+                controls.classList.add("dark");
+                currentTheme = "dark";
+            } else {
+                map.removeLayer(darkTile);
+                lightTile.addTo(map);
+                controls.classList.remove("dark");
+                currentTheme = "light";
+            }
+
+            updateRadius(); // refresh warna lingkaran sesuai tema
+        }
+    </script>
+</body>
+
+</html>
